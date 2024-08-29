@@ -1,0 +1,76 @@
+name: Build jar and docker Image
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+         fetch-depth: 0
+         
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          
+      - name: Build with Maven
+        run: |
+          mvn clean package -Dmaven.test.skip=true
+          cp target/*.jar .
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-jar
+          path: ./*.jar
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Setup TEST AWS ECR Details
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ vars.ECR_IMAGE_PUSH_AWS_ROLE }}
+          role-session-name: github-actions
+          aws-region: ${{ secrets.TEST_AWS_REGION}}
+
+      - name: Login to us-non-prod Amazon ECR
+        id: login-aws-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+     
+      - name: ECR Repo Name
+        id: ecr-repo-name
+        run: |
+          REPO_NAME=`echo $GITHUB_REPOSITORY | cut -f2 -d"/"`
+          echo "ECR_REPO=$REPO_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ steps.login-aws-ecr.outputs.registry }}/${{ steps.ecr-repo-name.outputs.ECR_REPO }}
+          tags: |
+            type=raw,value=1.{{date 'YYYYMMDD'}}.${{ github.run_number }}.${{ github.run_attempt }}
+            type=raw,value=latest
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+         context: .
+         platforms: linux/amd64
+         push: true
+         tags: ${{ steps.meta.outputs.tags }}
+         labels: ${{ steps.meta.outputs.labels }}
+         provenance: false
+
