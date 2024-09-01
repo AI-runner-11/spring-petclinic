@@ -91,8 +91,8 @@ jobs:
            # Verify the update
            cat k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
            # Optionally, commit and push the changes back to the repository
-           git config --global user.name "Your Name"
-           git config --global user.email "your.email@example.com"
+           git config --global user.name "chandrapal11"
+           git config --global user.email "chandrapal22@gmail.com"
            git add k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
            git commit -m "Update image tag to $BUILD_VERSION"
            git push origin main
