@@ -87,9 +87,9 @@ jobs:
            export BUILD_DATE=$(date +%Y%m%d)
            export BUILD_VERSION=1.${BUILD_DATE}.${{ github.run_number }}.${{ github.run_attempt }}
            # Update the image tag in the deployment.yaml file
-           sed -i.bak "s|\(image:.*spring-petclinic:\).*|\1$BUILD_VERSION|" /Users/admin/Desktop/Tech_learn/project/k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
+           sed -i.bak "s|\(image:.*spring-petclinic:\).*|\1$BUILD_VERSION|" project/k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
            # Verify the update
-           cat /Users/admin/Desktop/Tech_learn/project/k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
+           cat k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
            # Optionally, commit and push the changes back to the repository
            git config --global user.name "Your Name"
            git config --global user.email "your.email@example.com"
