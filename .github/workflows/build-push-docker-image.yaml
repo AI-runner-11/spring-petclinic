@@ -93,7 +93,7 @@ jobs:
            {
               "event_type":"update-docker-tag",
               "client_payload": {
-                "path":"k8s-deployment/us-east-2/apps",
+                "path":"k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml",
                 "service":"spring-petclinic",
                 "imageTag":"$BUILD_VERSION"
                }
