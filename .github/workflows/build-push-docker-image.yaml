@@ -86,17 +86,6 @@ jobs:
          run: |
            export BUILD_DATE=$(date +%Y%m%d)
            export BUILD_VERSION=1.${BUILD_DATE}.${{ github.run_number }}.${{ github.run_attempt }}
-           # Update the image tag in the deployment.yaml file
-           sed -i.bak "s|\(image:.*spring-petclinic:\).*|\1$BUILD_VERSION|" project/k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
-           # Verify the update
-           cat k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
-           # Optionally, commit and push the changes back to the repository
-           git config --global user.name "chandrapal11"
-           git config --global user.email "chandrapal22@gmail.com"
-           git add k8s-deployment/us-east-2/apps/spring-petclinic/deployment.yaml
-           git commit -m "Update image tag to $BUILD_VERSION"
-           git push origin main
-
            echo $GITOPS_REPO
            generate_post_data()
            {
@@ -104,7 +93,7 @@ jobs:
            {
               "event_type":"update-docker-tag",
               "client_payload": {
-                "path":"k8s-deployment/us-east-2/apps/spring-petclinic",
+                "path":"k8s-deployment/us-east-2/apps",
                 "service":"spring-petclinic",
                 "imageTag":"$BUILD_VERSION"
                }
